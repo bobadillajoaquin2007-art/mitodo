@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¿Quieres Ser Mi Todo?</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Quicksand:wght@400;600&display=swap');
+        
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background-color: #ffe4e6;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+        }
+
+        .heart {
+            position: absolute;
+            color: #fb7185;
+            animation: float 6s linear infinite;
+            opacity: 0.6;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+        }
+
+        .main-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            border: 5px solid #fda4af;
+            z-index: 10;
+            position: relative;
+            width: 90%;
+            max-width: 550px;
+            min-height: 450px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        h1 {
+            font-family: 'Dancing Script', cursive;
+        }
+
+        /* Estilo base del botón NO */
+        #btn-no {
+            transition: left 0.2s ease-out, top 0.2s ease-out, transform 0.1s, background-color 0.3s;
+            white-space: nowrap;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            z-index: 50;
+        }
+
+        /* Clase para cuando el NO se rinde pero se mantiene oculto/discreto */
+        #btn-no.surrendered {
+            background-color: #e2e8f0 !important; /* Gris muy similar al original */
+            color: #94a3b8 !important;
+            border: 1px solid #cbd5e1;
+        }
+
+        /* Clase final para cuando ya se acepta el SI camuflado */
+        #btn-no.accepted {
+            background: linear-gradient(to right, #f43f5e, #ec4899) !important;
+            color: white !important;
+            transform: scale(1.2) !important;
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            z-index: 100;
+            animation: confetti-fall 3s linear forwards;
+        }
+
+        @keyframes confetti-fall {
+            0% { transform: translateY(-10vh) rotate(0deg); }
+            100% { transform: translateY(100vh) rotate(720deg); }
+        }
+
+        /* Contenedor relativo para los botones */
+        .btn-wrapper {
+            position: relative;
+            width: 100%;
+            height: 120px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="hearts-container"></div>
+
+    <div id="card" class="main-card p-8 md:p-12 rounded-[3rem] shadow-2xl text-center border-double">
+        <div class="mb-6 text-7xl text-rose-500 animate-bounce">
+            <i class="fas fa-heart"></i>
+        </div>
+        
+        <h1 class="text-5xl md:text-6xl font-bold text-rose-600 mb-8">
+            ¿Quieres Ser Mi Todo?
+        </h1>
+
+        <div class="btn-wrapper" id="btn-wrapper">
+            <!-- El SÍ siempre se queda aquí -->
+            <button id="btn-si" class="bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white text-2xl md:text-3xl font-bold px-10 py-4 rounded-full transform hover:scale-110 active:scale-95 transition-all">
+                ¡SÍ! 💖
+            </button>
+            
+            <!-- El NO empieza aquí al lado -->
+            <button id="btn-no" class="bg-slate-200 text-slate-500 text-xl font-bold px-8 py-4 rounded-full">
+                No 🥺
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal Final -->
+    <div id="success-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-rose-50/95 backdrop-blur-xl">
+        <div class="text-center p-10">
+            <div class="text-9xl mb-8">✨💖✨</div>
+            <h2 class="text-6xl md:text-8xl font-bold text-rose-600 mb-8 animate-pulse" style="font-family: 'Dancing Script';">
+                ¡Sabía que dirías que sí!
+            </h2>
+            <p class="text-2xl md:text-4xl text-rose-400 font-bold mb-10">
+                Me haces la persona más feliz del universo. <br>
+                ¡Gracias por ser mi todo! 🥰
+            </p>
+            <div class="flex justify-center gap-4 text-5xl animate-bounce">
+                🌹 💍 🌹 💍 🌹
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Corazones de fondo
+        const heartsContainer = document.getElementById('hearts-container');
+        function createHeart() {
+            const heart = document.createElement('i');
+            heart.className = 'fas fa-heart heart';
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.fontSize = (Math.random() * 20 + 15) + 'px';
+            heart.style.animationDuration = (Math.random() * 2 + 4) + 's';
+            heartsContainer.appendChild(heart);
+            setTimeout(() => heart.remove(), 6000);
+        }
+        setInterval(createHeart, 300);
+
+        const btnNo = document.getElementById('btn-no');
+        const btnSi = document.getElementById('btn-si');
+        const card = document.getElementById('card');
+        const wrapper = document.getElementById('btn-wrapper');
+
+        let interactionCount = 0;
+        let isSurrendered = false;
+
+        function jumpButton() {
+            if (isSurrendered) return; 
+
+            interactionCount++;
+
+            const cardRect = card.getBoundingClientRect();
+            const padding = 20;
+            const maxX = cardRect.width - btnNo.offsetWidth - padding;
+            const maxY = cardRect.height - btnNo.offsetHeight - padding;
+
+            const randomX = Math.random() * maxX;
+            const randomY = Math.random() * maxY;
+
+            // Si llega a 10 intentos, cambia el texto pero no el lugar ni el color llamativo
+            if (interactionCount >= 10) {
+                isSurrendered = true;
+                btnNo.innerText = "¡SÍ! 💖";
+                btnNo.classList.add('surrendered');
+                // Se queda en la última posición aleatoria, camuflado
+                btnNo.style.left = randomX + 'px';
+                btnNo.style.top = randomY + 'px';
+                return;
+            }
+
+            // En el primer intento, cambiamos el botón a 'absolute'
+            if (interactionCount === 1) {
+                btnNo.style.position = 'absolute';
+            }
+
+            // Aplicar la nueva posición
+            btnNo.style.left = randomX + 'px';
+            btnNo.style.top = randomY + 'px';
+            
+            // Pequeña animación de salto
+            btnNo.style.transform = 'scale(1.1)';
+            setTimeout(() => { if(!isSurrendered) btnNo.style.transform = 'scale(1)'; }, 100);
+        }
+
+        // Función para aceptar
+        function acceptProposal() {
+            document.getElementById('success-modal').classList.remove('hidden');
+            startConfetti();
+        }
+
+        // Eventos para el NO
+        btnNo.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            if (isSurrendered) {
+                btnNo.classList.add('accepted');
+                setTimeout(acceptProposal, 200);
+            } else {
+                jumpButton();
+            }
+        });
+
+        btnNo.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (isSurrendered) {
+                btnNo.classList.add('accepted');
+                setTimeout(acceptProposal, 200);
+            } else {
+                jumpButton();
+            }
+        });
+
+        // Evento para el SÍ original
+        btnSi.addEventListener('click', acceptProposal);
+
+        function startConfetti() {
+            const colors = ['#ff0000', '#ff69b4', '#ff1493', '#ffffff', '#ffd700'];
+            for(let i=0; i<150; i++) {
+                setTimeout(() => {
+                    const c = document.createElement('div');
+                    c.className = 'confetti';
+                    c.style.left = Math.random() * 100 + 'vw';
+                    c.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    c.style.width = '10px';
+                    c.style.height = '10px';
+                    c.style.borderRadius = '50%';
+                    c.style.animationDuration = '2s';
+                    document.body.appendChild(c);
+                    setTimeout(() => c.remove(), 3000);
+                }, i * 15);
+            }
+        }
+    </script>
+</body>
+</html>
